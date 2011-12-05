@@ -50,20 +50,32 @@ public class JDBCTestCase {
 		
 	}
 	
-
 	@Test(expected=SQLException.class)
-	public void testSQLExceptionWhenExecuteUpdateInInsertValue() throws SQLException {
+	public void testExceptionWhenSecondCloseInGenerateValue() throws SQLException {
 		JDBCClassUnderTest classUnderTest = new JDBCClassUnderTest();
+		Connection conn = mock(Connection.class);
 		Statement stmt = mock(Statement.class);
-		when(stmt.executeUpdate(anyString())).thenThrow(new SQLException());
-		classUnderTest.insertValue(stmt, 0); 			
+		when(conn.createStatement()).thenReturn(stmt);		
+		doNothing().doThrow(new SQLException()).when(stmt).close();
+		classUnderTest.generateValue(conn);
+
+		
 	}
+
 	
 	@Test(expected=SQLException.class)
 	public void testSQLExceptionWhencloseInInsertValue() throws SQLException {
 		JDBCClassUnderTest classUnderTest = new JDBCClassUnderTest();
 		Statement stmt = mock(Statement.class);
 		doThrow(new SQLException()).when(stmt).close();
+		classUnderTest.insertValue(stmt, 0); 			
+	}
+
+	@Test(expected=SQLException.class)
+	public void testSQLExceptionWhenExecuteUpdateInInsertValue() throws SQLException {
+		JDBCClassUnderTest classUnderTest = new JDBCClassUnderTest();
+		Statement stmt = mock(Statement.class);
+		when(stmt.executeUpdate(anyString())).thenThrow(new SQLException());
 		classUnderTest.insertValue(stmt, 0); 			
 	}
 	
